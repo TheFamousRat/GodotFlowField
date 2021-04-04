@@ -63,7 +63,9 @@ Then build RVO2-3d :
 
 ```
 cd RVO2-3D
-cmake .
+mkdir _build
+cd _build
+cmake ..
 make
 ```
 

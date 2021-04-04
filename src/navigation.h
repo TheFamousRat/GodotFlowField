@@ -98,6 +98,31 @@ public:
 	void _process(float passed);
 
 	void registerAgent(Spatial* agentOwner);
+	void removeAgent(Spatial* agentOwner);
+	void initializeRVO();
+
+	void setAgentMaxNeighbors(Spatial* agentOwner, size_t maxNeighbours);
+	void setAgentMaxSpeed(Spatial* agentOwner, float newMaxSpeed);
+	void setAgentNeighborDist(Spatial* agentOwner, float newNeighbDist);
+	void setAgentPosition(Spatial* agentOwner, Vector3 newPos);
+	void setAgentPrefVelocity(Spatial* agentOwner, Vector3 newPrefVel);
+	void setAgentRadius(Spatial* agentOwner, float newRadius);
+	void setAgentTimeHorizon(Spatial* agentOwner, float timeHorizon);
+	void setAgentVelocity(Spatial* agentOwner, Vector3 newVel);
+	void setTimeStep(float newTimeStep);
+
+	size_t getAgentMaxNeighbors(Spatial* agentOwner);
+	float getAgentMaxSpeed(Spatial* agentOwner);
+	float getAgentNeighborDist(Spatial* agentOwner);
+	Vector3 getAgentPosition(Spatial* agentOwner);
+	Vector3 getAgentPrefVelocity(Spatial* agentOwner);
+	float getAgentRadius(Spatial* agentOwner);
+	float getAgentTimeHorizon(Spatial* agentOwner);
+	Vector3 getAgentVelocity(Spatial* agentOwner);
+	float getTimeStep();
+
+	Vector3 rvoVecToGodotVec(RVO::Vector3 vec);
+	RVO::Vector3 godotVecToRvoVec(Vector3 vec);
 
 	void recalculate_masks();
 	void fill_pointer_arrays();
