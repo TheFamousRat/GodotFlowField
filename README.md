@@ -35,7 +35,15 @@ Planned features :
  
 ## Installation
 
-Make sure git is installed on your computer. The go to your project's **addons/** folder, and open a terminal. Then run :
+Make sure git is installed on your computer. 
+
+First install dependencies :
+
+```
+sudo apt-get install libomp-dev
+```
+
+Then go to your project's **addons/** folder, and open a terminal. Then run :
 
 ```
 git clone --recursive https://github.com/TheFamousRat/GodotFlowField.git 

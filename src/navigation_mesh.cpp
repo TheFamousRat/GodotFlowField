@@ -493,19 +493,29 @@ bool DetourNavigationMesh::load_mesh()
 		{
 			build_debug_mesh(false);
 		}
+
+		//If the code here was reached, there was saved input to load
 		rebuildGridMap();
 
 		PoolVector3Array temp;
 		temp.push_back(Vector3(-27,52.5,9));
-		flowField->cellsFromGridMap(gridmap);
 
 		auto start = std::chrono::high_resolution_clock::now();
 
-		for (int i(0) ; i < 100 ; i++)
-			flowField->createIntegrationField_fromGlobalPos(temp);
+		unsigned int iterationsAmount = 100;
+		for (int i(0) ; i < iterationsAmount ; i++)
+			flowField->cellsFromGridMap(gridmap);
 
 		auto end = std::chrono::high_resolution_clock::now();
-    	std::cout << "Integration field building : " << std::chrono::duration_cast<std::chrono::milliseconds>( end - start).count() << '\n';
+    	std::cout << "Flow field building average : " 
+		<< std::chrono::duration_cast<std::chrono::milliseconds>( end - start).count() / static_cast<double>(iterationsAmount) 
+		<< "ms"
+		<< '\n';
+		
+		start = std::chrono::high_resolution_clock::now();
+
+		flowField->createIntegrationField_fromGlobalPos(temp);
+		
 
 		flowField->buildDebugDistanceField();
 
