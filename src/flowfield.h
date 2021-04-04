@@ -14,6 +14,7 @@
 #include <unordered_set>
 #include <queue>
 #include <map>
+#include <execution>
 #include <Godot.hpp>
 #include <ArrayMesh.hpp>
 #include <GridMap.hpp>

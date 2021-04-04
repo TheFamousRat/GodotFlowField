@@ -146,13 +146,14 @@ bool FlowField::createIntegrationField_fromGlobalPos(PoolVector3Array& targetsPo
 bool FlowField::_createIntegrationField(std::vector<Cell*>& targetCells) {
 	initializeIntegrationField();
 
-	if (targetCells.size() == 1) {
+	/*if (targetCells.size() == 1) {
 		//Dijkstra is faster than Lee, but can't work with multiple targets for now
 		_integrationField_Dijkstra(targetCells[0]);
 	}
 	else {
 		_integrationField_Lee(targetCells);
-	}
+	}*/
+	_integrationField_Lee(targetCells); //Lee seems faster in all cases now
 
 	bakeCellBestDirections();
 
@@ -447,7 +448,7 @@ void FlowField::cellsFromGridMap(FlowFieldGridMap* newGridMap) {
 }
 
 Vector3 FlowField::getCellInfluenceAtPos(Vector3 worldPos, Cell* cell, float* allWeights) {
-	Vector3 cellCenter = gridmap->map_to_world(cell->cellPos[0], cell->cellPos[1], cell->cellPos[2]);
+	/*Vector3 cellCenter = gridmap->map_to_world(cell->cellPos[0], cell->cellPos[1], cell->cellPos[2]);
 	Vector3 centeredCellPos = (worldPos - cellCenter) * 2.0f / gridmap->get_cell_size().x;
 
 	std::array<float, 3> alphaProposals;
@@ -460,7 +461,7 @@ Vector3 FlowField::getCellInfluenceAtPos(Vector3 worldPos, Cell* cell, float* al
 	float distWeight = 1.0f / (worldPos - cellCenter).length_squared();//std::exp(-alpha*0.05f);
 	*allWeights += distWeight;
 
-	return cell->bestDirection * distWeight;
+	return cell->bestDirection * distWeight;*/
 }
 
 Vector3 FlowField::getBestDirectionFromPos(Vector3 currentWorldPos) {
