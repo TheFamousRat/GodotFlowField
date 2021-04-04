@@ -51,8 +51,25 @@ cd GodotFlowField
 git clone --recursive https://github.com/godotengine/godot-cpp.git
 ```
 
-Open then the file "SConstruct" in the GodotFlowField folder, and replace the varibles "godot_headers_path" and "cpp_bindings_path" by the paths of your godot-cpp and godot-headers that you downloaded with the last command. If you ran exactly the commands above, they should be in a path like (path to your Godot project....)/addons/GodotFlowField/godot-cpp. 
-Then, make sure the build utility "Scons" is installed. If not, you can install it with python by simply running 
+You then need to build the relevant libraries. First godot-cpp (that I advise you to put somewhere else if you intend to use GDNative a lot, it's used very often) :
+
+```
+cd godot-cpp
+scons generate_bindings=yes -j4
+cd ..
+```
+
+Then build RVO2-3d :
+
+```
+cd RVO2-3D
+cmake .
+make
+cd src
+make
+```
+
+The dependencies are all built ! Perfect. Now, onto building the library itself. We need the scons utility tool to perform this task. If you don't have it, just open. If not, you can install it with python by simply running 
  
 ```
 python -m pip install scons
@@ -63,6 +80,10 @@ or, if you use Python 3,
 ```
 python3 -m pip install scons
 ```
+
+Finally, you need to make sure the godot-headers and godot-cpp files are reachable by Sconstruct (it needs to know their exact location). For this, open the file "SConstruct" in the GodotFlowField folder. What interests us here is the variables  "godot_headers_path" and "cpp_bindings_path". If you don't find them, Ctrl+F them in the file. You need to replace the paths in those variables by the path of your own godot-cpp. If you have only followed the instructions (closely) and haven't changed the godot-cpp folder location (you dirty copy-paster), the location should be simply "godot-cpp" and "godot-cpp/godot-headers".
+
+Then, make sure the build utility "Scons" is installed.
 
 Once that's done, simply run 
 
