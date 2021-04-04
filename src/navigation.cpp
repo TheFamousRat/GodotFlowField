@@ -11,10 +11,18 @@ void DetourNavigation::_register_methods()
 	register_method("create_navmesh", &DetourNavigation::create_navmesh);
 	register_method("_exit_tree", &DetourNavigation::_exit_tree);
 	register_method("_enter_tree", &DetourNavigation::_enter_tree);
-
 	register_method("_on_tree_exiting", &DetourNavigation::_on_tree_exiting);
 
+	register_method("registerAgent", &DetourNavigation::registerAgent);
+
 	register_property<DetourNavigation, bool>("auto_add_remove_objects", &DetourNavigation::set_auto_object_management, &DetourNavigation::get_auto_object_management, true);
+}
+
+/** Exposed functions **/
+
+void DetourNavigation::registerAgent(Spatial* agentOwner) {
+	Vector3 ownerGlobalPos = agentOwner->get_global_transform().origin;
+	registeredAgents[agentOwner] = sim->addAgent(RVO::Vector3({ownerGlobalPos[0], ownerGlobalPos[1], ownerGlobalPos[2]}));
 }
 
 DetourNavigation::DetourNavigation()
@@ -33,8 +41,8 @@ void DetourNavigation::_on_tree_exiting()
 {
 	if (!Engine::get_singleton()->is_editor_hint() && auto_object_management)
 	{
-		get_tree()->disconnect("node_added", this, "add_collision_shape");
-		get_tree()->disconnect("node_removed", this, "remove_collision_shape");
+		/*get_tree()->disconnect("node_added", this, "add_collision_shape");
+		get_tree()->disconnect("node_removed", this, "remove_collision_shape");*/
 	}
 }
 
@@ -46,6 +54,8 @@ void DetourNavigation::_enter_tree()
 	{
 		
 	}
+
+	sim = new RVO::RVOSimulator();
 }
 
 void DetourNavigation::_init()
@@ -84,10 +94,12 @@ void DetourNavigation::_ready()
 	}
 	else
 	{
-		get_tree()->connect("node_added", this, "add_collision_shape");
-		get_tree()->connect("node_removed", this, "remove_collision_shape");
+		/*get_tree()->connect("node_added", this, "add_collision_shape");
+		get_tree()->connect("node_removed", this, "remove_collision_shape");*/
 	}
 }
+
+/** Non-exposed **/
 
 void DetourNavigation::set_auto_object_management (bool v)
 {

@@ -28,13 +28,14 @@
 #include <StaticBody.hpp>
 #include <CollisionShape.hpp>
 
-#include "navigation_mesh.h"
 #include "Recast.h"
 #include "DetourNavMesh.h"
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
+#include "navigation_mesh.h"
 #include "helpers.h"
 #include "navmesh_generator.h"
+#include "RVO.h"
 
 #define UPDATE_INTERVAL 0.1f //The inverse of this constant is the update frequency
 
@@ -77,6 +78,9 @@ private:
 	std::vector<StaticBody *> static_bodies_to_add;
 	std::vector<int64_t> collisions_to_remove;
 
+	std::unordered_map<Spatial*, int> registeredAgents;
+	RVO::RVOSimulator *sim = nullptr;
+
 public:
 	static void _register_methods();
 
@@ -91,6 +95,9 @@ public:
 
 	void _init();
 	void _ready();
+	void _process(float passed);
+
+	void registerAgent(Spatial* agentOwner);
 
 	void recalculate_masks();
 	void fill_pointer_arrays();
@@ -98,8 +105,6 @@ public:
 	void rebuild_dirty_debug_meshes();
 
 	void save_collision_shapes(DetourNavigationMeshGenerator *generator);
-
-	void _process(float passed);
 
 	DetourNavigationMesh *create_navmesh(Ref<NavmeshParameters> np);
 
