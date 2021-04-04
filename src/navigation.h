@@ -29,14 +29,12 @@
 #include <CollisionShape.hpp>
 
 #include "navigation_mesh.h"
-#include "tilecache_navmesh.h"
 #include "Recast.h"
 #include "DetourNavMesh.h"
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
 #include "helpers.h"
 #include "navmesh_generator.h"
-#include "tilecache_generator.h"
 
 #define UPDATE_INTERVAL 0.1f //The inverse of this constant is the update frequency
 
@@ -97,46 +95,27 @@ public:
 	void recalculate_masks();
 	void fill_pointer_arrays();
 	void manage_changes();
-	void update_tilecache();
 	void rebuild_dirty_debug_meshes();
-
-	void add_box_obstacle_to_all(int64_t instance_id, Vector3 position,
-								 Vector3 extents, float rotationY, int collision_layer);
-
-	void add_cylinder_obstacle_to_all(int64_t instance_id, Vector3 position,
-									  float radius, float height, int collision_layer);
-
-	void remove_obstacle(CollisionShape *collision_shape);
 
 	void save_collision_shapes(DetourNavigationMeshGenerator *generator);
 
 	void _process(float passed);
 
-	DetourNavigationMeshCached *create_cached_navmesh(
-		Ref<CachedNavmeshParameters> np);
-
 	DetourNavigationMesh *create_navmesh(Ref<NavmeshParameters> np);
 
 	std::vector<DetourNavigationMesh *> navmeshes;
-	std::vector<DetourNavigationMeshCached *> cached_navmeshes;
 
 	/*
 	* @brief Responds to a call from the Godot editor to build a navmesh
 	*/
 	void build_navmesh(DetourNavigationMesh *navigation);
-	/*
-	* @brief Responds to a call from the Godot editor to build a cached navmesh
-	*/
-	void build_navmesh_cached(DetourNavigationMeshCached *navmesh);
+
 	void _notification(int p_what);
 	void _on_node_renamed(Variant v);
 
 	int process_large_mesh(MeshInstance *mesh_instance, int64_t collision_id,
 						   std::vector<Ref<Mesh>> *meshes, std::vector<Transform> *transforms,
 						   std::vector<AABB> *aabbs, std::vector<int64_t> *collision_ids);
-
-	void _on_cache_collision_shape_added(Variant node);
-	void _on_cache_collision_shape_removed(Variant node);
 
 	void _on_collision_shape_added(Variant node);
 	void _on_collision_shape_removed(Variant node);

@@ -1,6 +1,5 @@
 #include "navigation.h"
 #include "navigation_mesh.h"
-#include "tilecache_navmesh.h"
 
 extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o)
 {
@@ -18,8 +17,6 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle)
 	godot::register_tool_class<godot::DetourNavigation>();
 	godot::register_tool_class<godot::DetourNavigationMesh>();
 	godot::register_tool_class<godot::NavmeshParameters>();
-	godot::register_tool_class<godot::CachedNavmeshParameters>();
-	godot::register_tool_class<godot::DetourNavigationMeshCached>();
 	godot::register_tool_class<godot::FlowFieldGridMap>();
 	godot::register_tool_class<godot::FlowField>();
 }

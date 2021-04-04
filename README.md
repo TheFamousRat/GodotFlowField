@@ -65,8 +65,6 @@ Then build RVO2-3d :
 cd RVO2-3D
 cmake .
 make
-cd src
-make
 ```
 
 The dependencies are all built ! Perfect. Now, onto building the library itself. We need the scons utility tool to perform this task. If you don't have it, just open. If not, you can install it with python by simply running 
