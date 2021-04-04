@@ -195,20 +195,22 @@ env.Append(LIBPATH=[cpp_bindings_path + 'bin/'])
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=[
+	'src/',
+	'src/helpers/',
 	'src/recastnavigation/Detour/Include/',
 	'src/recastnavigation/DetourTileCache/Include/',
 	'src/recastnavigation/Recast/Include/',
-	'src/helpers/',
-	'src/',
+	'src/RVO2-3D/src/'
 	])
 
 sources_list = [
 	Glob('src/*.cpp'),
+	Glob('src/helpers/*.c'),
+	Glob('src/helpers/*.cpp'),
 	Glob('src/recastnavigation/Detour/Source/*.cpp'),
 	Glob('src/recastnavigation/DetourTileCache/Source/*.cpp'),
 	Glob('src/recastnavigation/Recast/Source/*.cpp'),
-	Glob('src/helpers/*.c'),
-	Glob('src/helpers/*.cpp'),
+	Glob('src/RVO2-3D/src/*.cpp'),
 ]
 
 sources = []
