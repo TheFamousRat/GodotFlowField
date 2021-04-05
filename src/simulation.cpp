@@ -61,25 +61,25 @@ Agent* Simulation::getAgent(Spatial* agentOwner) {
 }
 
 Vector3 Simulation::getAgentPosition(Spatial* agentOwner) {
-
+    return getAgent(agentOwner)->position;
 }
 
 Vector3 Simulation::getAgentPrefVelocity(Spatial* agentOwner) {
-    
+    return getAgent(agentOwner)->prefVelocity;
 }
 
 Vector3 Simulation::getAgentVelocity(Spatial* agentOwner) {
-    
+    return getAgent(agentOwner)->velocity;
 }
 
 void Simulation::setAgentPosition(Spatial* agentOwner, Vector3 newPos) {
-    
+    getAgent(agentOwner)->position = newPos;
 }
 
 void Simulation::setAgentPrefVelocity(Spatial* agentOwner, Vector3 newPrefVel) {
-    
+    getAgent(agentOwner)->prefVelocity = newPrefVel;
 }
 
 void Simulation::setAgentVelocity(Spatial* agentOwner, Vector3 newVel) {
-    
+    getAgent(agentOwner)->velocity = newVel;
 }

@@ -14,7 +14,7 @@ namespace godot {
     class Agent {
         public:
             Vector3 position; //The last agent position
-            Vector3 desiredVelocity; //The last targeted agent velocity
+            Vector3 prefVelocity; //The last targeted agent velocity
             Vector3 velocity; //The real last velocity of the agent
 
         public:
