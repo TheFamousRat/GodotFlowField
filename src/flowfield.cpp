@@ -344,6 +344,7 @@ void FlowField::bakeCellNeighbours(Cell* cell) {
 	if (it != cellsNeighbours.end()) {
 		cellsNeighbours.erase(it);
 	}
+	cell->obstacleDirection = PoolVector3Array();
 
 	std::vector<NeighbourCell> neighbours;
 	Vector3 cellPos = Vector3(cell->cellPos[0], cell->cellPos[1], cell->cellPos[2]);
@@ -391,15 +392,16 @@ void FlowField::bakeCellNeighbours(Cell* cell) {
 					}
 				}
 
-				if (currentSideUncovered && (x == 0 || z == 0)) {
+				if (currentSideUncovered) {
 					//The current cell was identified as ledge cell
-					//setCellGridMapElement(cell, 10);
-					cell->baseCost = LEDGE_COST;
+					cell->obstacleDirection.push_back(Vector3(x, 0.0, z));
 				}
 
 			}
 		}
 	}
+
+	cell->baseCost += cell->obstacleDirection.size() * LEDGE_COST;
 
 	cellsNeighbours[cell] = std::vector<NeighbourCell>(neighbours);
 }

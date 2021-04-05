@@ -73,6 +73,11 @@ struct Cell {
 		 */
 		Vector3 bestDirection;
 
+		/*
+		 * @brief All directions leading either to an obstacle or to a ledge/void etc. More simply, all directions to which a cell has no neighbour
+		 */
+		PoolVector3Array obstacleDirection;
+
 		Cell();
 		Cell(std::array<int, 3> pos);
 		~Cell();
