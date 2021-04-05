@@ -15,26 +15,6 @@ void DetourNavigation::_register_methods()
 
 	register_method("registerAgent", &DetourNavigation::registerAgent);
 	register_method("removeAgent", &DetourNavigation::removeAgent);
-
-	register_method("setAgentMaxNeighbors", &DetourNavigation::setAgentMaxNeighbors);
-	register_method("setAgentMaxSpeed", &DetourNavigation::setAgentMaxSpeed);
-	register_method("setAgentNeighborDist", &DetourNavigation::setAgentNeighborDist);
-	register_method("setAgentPosition", &DetourNavigation::setAgentPosition);
-	register_method("setAgentPrefVelocity", &DetourNavigation::setAgentPrefVelocity);
-	register_method("setAgentRadius", &DetourNavigation::setAgentRadius);
-	register_method("setAgentTimeHorizon", &DetourNavigation::setAgentTimeHorizon);
-	register_method("setAgentVelocity", &DetourNavigation::setAgentVelocity);
-	register_method("setTimeStep", &DetourNavigation::setTimeStep);
-
-	register_method("getAgentMaxNeighbors", &DetourNavigation::getAgentMaxNeighbors);
-	register_method("getAgentMaxSpeed", &DetourNavigation::getAgentMaxSpeed);
-	register_method("getAgentNeighborDist", &DetourNavigation::getAgentNeighborDist);
-	register_method("getAgentPosition", &DetourNavigation::getAgentPosition);
-	register_method("getAgentPrefVelocity", &DetourNavigation::getAgentPrefVelocity);
-	register_method("getAgentRadius", &DetourNavigation::getAgentRadius);
-	register_method("getAgentTimeHorizon", &DetourNavigation::getAgentTimeHorizon);
-	register_method("getAgentVelocity", &DetourNavigation::getAgentVelocity);
-	register_method("getTimeStep", &DetourNavigation::getTimeStep);
 	
 	register_property<DetourNavigation, bool>("auto_add_remove_objects", &DetourNavigation::set_auto_object_management, &DetourNavigation::get_auto_object_management, true);
 }
@@ -44,20 +24,17 @@ void DetourNavigation::_register_methods()
 void DetourNavigation::registerAgent(Spatial* agentOwner) {
 	Vector3 ownerGlobalPos = agentOwner->get_global_transform().origin;
 	agentOwner->connect("tree_exiting", this, "removeAgent");
-	registeredAgents[agentOwner] = sim->addAgent(RVO::Vector3({ownerGlobalPos[0], ownerGlobalPos[1], ownerGlobalPos[2]}));
 }
 
 void DetourNavigation::removeAgent(Spatial* agentOwner) {
 	if (godot_is_instance_valid(agentOwner)) {
 		agentOwner->disconnect("tree_exiting", this, "removeAgent");
 	}
-	sim->removeAgent(registeredAgents[agentOwner]);
-	registeredAgents.erase(agentOwner);
 }
 
 DetourNavigation::DetourNavigation()
 {
-	initializeRVO();
+	
 }
 
 DetourNavigation::~DetourNavigation()
@@ -85,12 +62,6 @@ void DetourNavigation::_enter_tree()
 	{
 		
 	}
-}
-
-void DetourNavigation::initializeRVO() {
-	sim = new RVO::RVOSimulator();
-	sim->setTimeStep(0.02);
-	sim->setAgentDefaults(3.0, 4, 0.05, 1.0, 2.0);
 }
 
 void DetourNavigation::_init()
@@ -133,89 +104,6 @@ void DetourNavigation::_ready()
 		get_tree()->connect("node_removed", this, "remove_collision_shape");*/
 	}
 }
-
-/*Boring I/O ahead*/
-void DetourNavigation::setAgentMaxNeighbors(Spatial* agentOwner, size_t maxNeighbours) {
-	sim->setAgentMaxNeighbors(registeredAgents[agentOwner], maxNeighbours);
-}
-
-void DetourNavigation::setAgentMaxSpeed(Spatial* agentOwner, float newMaxSpeed) {
-	sim->setAgentMaxSpeed(registeredAgents[agentOwner], newMaxSpeed);
-}
-
-void DetourNavigation::setAgentNeighborDist(Spatial* agentOwner, float newNeighbDist) {
-	sim->setAgentNeighborDist(registeredAgents[agentOwner], newNeighbDist);
-}
-
-void DetourNavigation::setAgentPosition(Spatial* agentOwner, Vector3 newPos) {
-	sim->setAgentPosition(registeredAgents[agentOwner], godotVecToRvoVec(newPos));
-}
-
-void DetourNavigation::setAgentPrefVelocity(Spatial* agentOwner, Vector3 newPrefVel) {
-	sim->setAgentPrefVelocity(registeredAgents[agentOwner], godotVecToRvoVec(newPrefVel));
-}	
-
-void DetourNavigation::setAgentRadius(Spatial* agentOwner, float newRadius) {
-	sim->setAgentRadius(registeredAgents[agentOwner], newRadius);
-}
-
-void DetourNavigation::setAgentTimeHorizon(Spatial* agentOwner, float timeHorizon) {
-	sim->setAgentTimeHorizon(registeredAgents[agentOwner], timeHorizon);
-}
-
-void DetourNavigation::setAgentVelocity(Spatial* agentOwner, Vector3 newVel) {
-	sim->setAgentVelocity(registeredAgents[agentOwner], godotVecToRvoVec(newVel));
-}
-
-void DetourNavigation::setTimeStep(float newTimeStep) {
-	sim->setTimeStep(newTimeStep);
-}
-
-size_t DetourNavigation::getAgentMaxNeighbors(Spatial* agentOwner) {
-	return sim->getAgentMaxNeighbors(registeredAgents[agentOwner]);
-}
-
-float DetourNavigation::getAgentMaxSpeed(Spatial* agentOwner) {
-	return sim->getAgentMaxSpeed(registeredAgents[agentOwner]);
-}
-
-float DetourNavigation::getAgentNeighborDist(Spatial* agentOwner) {
-	return sim->getAgentNeighborDist(registeredAgents[agentOwner]);
-}
-
-Vector3 DetourNavigation::getAgentPosition(Spatial* agentOwner) {
-	return rvoVecToGodotVec(sim->getAgentPosition(registeredAgents[agentOwner]));
-}
-
-Vector3 DetourNavigation::getAgentPrefVelocity(Spatial* agentOwner) {
-	return rvoVecToGodotVec(sim->getAgentPrefVelocity(registeredAgents[agentOwner]));
-}
-
-float DetourNavigation::getAgentRadius(Spatial* agentOwner) {
-	return sim->getAgentRadius(registeredAgents[agentOwner]);
-}
-
-float DetourNavigation::getAgentTimeHorizon(Spatial* agentOwner) {
-	return sim->getAgentTimeHorizon(registeredAgents[agentOwner]);
-}
-
-Vector3 DetourNavigation::getAgentVelocity(Spatial* agentOwner) {
-	return rvoVecToGodotVec(sim->getAgentVelocity(registeredAgents[agentOwner]));
-}
-
-float DetourNavigation::getTimeStep() {
-	return sim->getTimeStep();
-}
-
-Vector3 DetourNavigation::rvoVecToGodotVec(RVO::Vector3 vec) {
-	return Vector3(vec[0], vec[1], vec[2]);
-}
-
-RVO::Vector3 DetourNavigation::godotVecToRvoVec(Vector3 vec) {
-	return RVO::Vector3({vec[0], vec[1], vec[2]});
-}
-
-/** Non-exposed **/
 
 void DetourNavigation::set_auto_object_management (bool v)
 {

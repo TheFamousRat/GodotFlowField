@@ -199,9 +199,7 @@ env.Append(CPPPATH=[
 	'src/helpers/',
 	'src/recastnavigation/Detour/Include/',
 	'src/recastnavigation/DetourTileCache/Include/',
-	'src/recastnavigation/Recast/Include/',
-	'src/RVO2-3D/src/',
-	'src/RVO2-3D/_build/src'
+	'src/recastnavigation/Recast/Include/'
 	])
 
 sources_list = [

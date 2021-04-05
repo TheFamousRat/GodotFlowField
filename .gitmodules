@@ -5,7 +5,3 @@
 [submodule "src/recastnavigation"]
     path = src/recastnavigation
     url = https://github.com/recastnavigation/recastnavigation.git
-    
-[submodule "src/RVO2-3D"]
-    path = src/RVO2-3D
-    url = https://github.com/TheFamousRat/RVO2-3D.git
