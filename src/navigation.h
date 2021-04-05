@@ -99,6 +99,18 @@ public:
 	void registerAgent(Spatial* agentOwner, Area* neighboursDetector);
 	void removeAgent(Spatial* agentOwner);
 
+	void doStep();
+
+	Vector3 getAgentPosition(Spatial* agentOwner);
+	Vector3 getAgentPrefVelocity(Spatial* agentOwner);
+	Vector3 getAgentVelocity(Spatial* agentOwner);
+	float getAgentMaxSpeed(Spatial* agentOwner);
+
+	void setAgentPosition(Spatial* agentOwner, Vector3 newPos);
+	void setAgentPrefVelocity(Spatial* agentOwner, Vector3 newPrefVel);
+	void setAgentVelocity(Spatial* agentOwner, Vector3 newVel);
+	void setAgentMaxSpeed(Spatial* agentOwner, float newMaxSpeed);
+
 	void recalculate_masks();
 	void fill_pointer_arrays();
 	void manage_changes();

@@ -16,6 +16,17 @@ void DetourNavigation::_register_methods()
 	register_method("registerAgent", &DetourNavigation::registerAgent);
 	register_method("removeAgent", &DetourNavigation::removeAgent);
 	
+	register_method("doStep", &DetourNavigation::doStep);
+	
+	register_method("getAgentPosition", &DetourNavigation::getAgentPosition);
+	register_method("getAgentPrefVelocity", &DetourNavigation::getAgentPrefVelocity);
+	register_method("getAgentVelocity", &DetourNavigation::getAgentVelocity);
+	register_method("getAgentMaxSpeed", &DetourNavigation::getAgentMaxSpeed);
+
+	register_method("setAgentPosition", &DetourNavigation::setAgentPosition);
+	register_method("setAgentPrefVelocity", &DetourNavigation::setAgentPrefVelocity);
+	register_method("setAgentVelocity", &DetourNavigation::setAgentVelocity);
+	register_method("setAgentMaxSpeed", &DetourNavigation::setAgentMaxSpeed);
 	
 	register_property<DetourNavigation, bool>("auto_add_remove_objects", &DetourNavigation::set_auto_object_management, &DetourNavigation::get_auto_object_management, true);
 }
@@ -28,6 +39,42 @@ void DetourNavigation::registerAgent(Spatial* agentOwner, Area* neighboursDetect
 
 void DetourNavigation::removeAgent(Spatial* agentOwner) {
 	sim->deleteAgent(agentOwner);
+}
+
+void DetourNavigation::doStep() {
+	sim->doStep();
+}
+
+Vector3 DetourNavigation::getAgentPosition(Spatial* agentOwner) {
+	return sim->getAgent(agentOwner)->position;
+}
+
+Vector3 DetourNavigation::getAgentPrefVelocity(Spatial* agentOwner) {
+	return sim->getAgent(agentOwner)->prefVelocity;
+}
+
+Vector3 DetourNavigation::getAgentVelocity(Spatial* agentOwner) {
+	return sim->getAgent(agentOwner)->velocity;
+}
+
+float DetourNavigation::getAgentMaxSpeed(Spatial* agentOwner) {
+	return sim->getAgent(agentOwner)->maxSpeed;
+}
+
+void DetourNavigation::setAgentPosition(Spatial* agentOwner, Vector3 newPos) {
+	sim->getAgent(agentOwner)->position = newPos;
+}
+
+void DetourNavigation::setAgentPrefVelocity(Spatial* agentOwner, Vector3 newPrefVel) {
+	sim->getAgent(agentOwner)->prefVelocity = newPrefVel;
+}
+
+void DetourNavigation::setAgentVelocity(Spatial* agentOwner, Vector3 newVel) {
+	sim->getAgent(agentOwner)->velocity = newVel;
+}
+
+void DetourNavigation::setAgentMaxSpeed(Spatial* agentOwner, float newMaxSpeed) {
+	sim->getAgent(agentOwner)->maxSpeed = newMaxSpeed;
 }
 
 DetourNavigation::DetourNavigation()
