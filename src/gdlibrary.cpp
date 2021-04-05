@@ -19,4 +19,5 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle)
 	godot::register_tool_class<godot::NavmeshParameters>();
 	godot::register_tool_class<godot::FlowFieldGridMap>();
 	godot::register_tool_class<godot::FlowField>();
+	godot::register_tool_class<godot::Simulation>();
 }

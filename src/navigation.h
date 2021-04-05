@@ -35,6 +35,7 @@
 #include "navigation_mesh.h"
 #include "helpers.h"
 #include "navmesh_generator.h"
+#include "simulation.hpp"
 
 #define UPDATE_INTERVAL 0.1f //The inverse of this constant is the update frequency
 
@@ -77,6 +78,8 @@ private:
 	std::vector<StaticBody *> static_bodies_to_add;
 	std::vector<int64_t> collisions_to_remove;
 
+	Simulation *sim;
+
 public:
 	static void _register_methods();
 
@@ -93,7 +96,7 @@ public:
 	void _ready();
 	void _process(float passed);
 
-	void registerAgent(Spatial* agentOwner);
+	void registerAgent(Spatial* agentOwner, Area* neighboursDetector);
 	void removeAgent(Spatial* agentOwner);
 
 	void recalculate_masks();
