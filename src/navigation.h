@@ -99,7 +99,7 @@ public:
 	void registerAgent(Spatial* agentOwner, Area* neighboursDetector);
 	void removeAgent(Spatial* agentOwner);
 
-	void doStep();
+	void doStep(float stepTime);
 
 	Vector3 getAgentPosition(Spatial* agentOwner);
 	Vector3 getAgentPrefVelocity(Spatial* agentOwner);

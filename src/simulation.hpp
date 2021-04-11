@@ -10,23 +10,11 @@
 #include <Vector3.hpp>
 #include <Spatial.hpp>
 #include <Area.hpp>
+#include <Plane.hpp>
+
+#include "Agent.hpp"
 
 namespace godot {
-
-    class Agent {
-
-        public:
-            Vector3 position; //The last agent position
-            Vector3 prefVelocity; //The last targeted agent velocity
-            Vector3 velocity; //The real last velocity of the agent
-            float maxSpeed;
-
-        public:
-            Agent();
-            ~Agent();
-
-            Area* neighboursDetector; //Used to quickly detect where the agent's neighbours are
-    };
 
     class Simulation : public Node {
 	    
@@ -45,7 +33,11 @@ namespace godot {
             void deleteAgent(Spatial* agentOwner);
             Agent* getAgent(Spatial* agentOwner);
 
-            void doStep();
+            void doStep(float stepTime);
+
+            Vector3 getAgentDrivingForce(Agent* agent);
+            Vector3 getAgentInteractionsForce(Agent* agent);
+            Vector3 getAgentLimitsForce(Agent* agent);
 
             Vector3 getAgentPosition(Spatial* agentOwner);
             Vector3 getAgentPrefVelocity(Spatial* agentOwner);

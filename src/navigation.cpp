@@ -41,8 +41,8 @@ void DetourNavigation::removeAgent(Spatial* agentOwner) {
 	sim->deleteAgent(agentOwner);
 }
 
-void DetourNavigation::doStep() {
-	sim->doStep();
+void DetourNavigation::doStep(float stepTime) {
+	sim->doStep(stepTime);
 }
 
 Vector3 DetourNavigation::getAgentPosition(Spatial* agentOwner) {
