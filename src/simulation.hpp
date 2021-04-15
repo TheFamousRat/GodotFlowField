@@ -32,12 +32,18 @@ namespace godot {
             void createAgent(Spatial* agentOwner, Area* neighboursDetector);
             void deleteAgent(Spatial* agentOwner);
             Agent* getAgent(Spatial* agentOwner);
+            std::vector<Agent*> getAgentNeighbours(Agent* agent);
+
+            //Velocity gradient as influenced by nearby agents
+            Vector3 getAgentNeighboursGradient(Agent* agent);
+            //Velocity gradient as influenced by nearby static obstacles
+            Vector3 getAgentObstaclesGradient(Agent* agent);
+            //Velocity gradient as influenced by agent targets
+            Vector3 getAgentSpeedPrefGradient(Agent* agent);
+            //Sum of the three above
+            Vector3 getAgentGradient(Agent* agent);
 
             void doStep(float stepTime);
-
-            Vector3 getAgentDrivingForce(Agent* agent);
-            Vector3 getAgentInteractionsForce(Agent* agent);
-            Vector3 getAgentLimitsForce(Agent* agent);
 
             Vector3 getAgentPosition(Spatial* agentOwner);
             Vector3 getAgentPrefVelocity(Spatial* agentOwner);

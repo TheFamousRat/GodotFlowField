@@ -56,13 +56,71 @@ Agent* Simulation::getAgent(Spatial* agentOwner) {
     }
 }
 
+std::vector<Agent*> Simulation::getAgentNeighbours(Agent* agent) {
+    std::vector<Agent*> ret;
+
+    godot::Array nearAreas = agent->neighboursDetector->get_overlapping_areas();
+
+    for (int i(0) ; i < nearAreas.size() ; i++) {
+        auto it = allAreas.find(nearAreas[i]);
+
+        if (it != allAreas.end()) {
+            ret.push_back(it->second);
+        }
+    }
+
+    return ret;
+}
+
+Vector3 Simulation::getAgentNeighboursGradient(Agent* agent) {
+    Vector3 ret = Vector3(0.0, 0.0, 0.0);
+
+    std::vector<Agent*> neighbours = getAgentNeighbours(agent);
+
+    for (auto it = neighbours.begin() ; it != neighbours.end() ; it++) {
+        ret += agent->neighbourGradient(*it, agent->velocity);
+    }
+
+    return ret;
+}
+
+Vector3 Simulation::getAgentObstaclesGradient(Agent* agent) {
+    Vector3 ret = Vector3(0.0, 0.0, 0.0);
+
+    std::vector<Cell*> obstacleCells = agent->flowField->getCellsNearToPos(agent->position, 10.0, true);
+
+    for (auto it = obstacleCells.begin() ; it != obstacleCells.end() ; it++) {
+        Cell* currentObstCell = (*it);
+        
+        godot::Array cellDirs = currentObstCell->obstacleDirection;
+        for (int i(0) ; i < cellDirs.size() ; i++) {
+            Vector3 cellCoords = agent->flowField->mapToWorld(Vector3(currentObstCell->cellPos[0], currentObstCell->cellPos[1], currentObstCell->cellPos[2]));
+            ret += agent->obstacleGradient(cellCoords, cellDirs[i], agent->velocity);
+        }
+    }
+
+    return ret;
+}
+
+Vector3 Simulation::getAgentSpeedPrefGradient(Agent* agent) {
+    Vector3 planeNormal = agent->prefVelocity.cross(agent->prefVelocity.cross(Vector3(0.0,1.0,0.0)));
+    return agent->speedPrefGradient(agent->velocity, planeNormal);
+}
+
+Vector3 Simulation::getAgentGradient(Agent* agent) {
+    Vector3 agentGradient = Vector3(0.0, 0.0, 0.0);
+
+    agentGradient += getAgentNeighboursGradient(agent);
+    agentGradient += getAgentObstaclesGradient(agent);
+    agentGradient += getAgentSpeedPrefGradient(agent);
+
+    return agentGradient;
+}
+
 void Simulation::doStep(float stepTime) {
-    // The goal of this method is to compute each agent's "real" velocity, using social forces model
     for (auto it = allAgents.begin() ; it != allAgents.end() ; it++) {
         Agent* agent = it->second;
         
-        
-		
     } 
 }
 

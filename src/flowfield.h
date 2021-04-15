@@ -31,12 +31,13 @@
 
 typedef unsigned int uint;
 typedef float cellVal;
+typedef std::array<int, 3> VecInt3;
 
 namespace godot {
 
 //Small helper to hash array<int, 3> objects
 struct ArrayHasher {
-    std::size_t operator()(const std::array<int, 3>& a) const {
+    std::size_t operator()(const VecInt3& a) const {
         std::size_t h = 0;
 
         for (auto e : a) {
@@ -66,7 +67,7 @@ struct Cell {
 		/*
 		 * @brief Coordinates of the cell within the gridmap. Can be converted to global pos with gridmap->map_to_world
 		 */
-		std::array<int, 3> cellPos;
+		VecInt3 cellPos;
 
 		/*
 		 * @brief Direction to take to get nearer to the current goal
@@ -79,7 +80,7 @@ struct Cell {
 		PoolVector3Array obstacleDirection;
 
 		Cell();
-		Cell(std::array<int, 3> pos);
+		Cell(VecInt3 pos);
 		~Cell();
 
 		Vector3 getWorldPos(GridMap* gridmap) {
@@ -108,12 +109,12 @@ class FlowField : public Node {
 
 	private:
 		//Dictionnary mapping a cell position to its cell
-		std::unordered_map<std::array<int, 3>, Cell*, ArrayHasher> allCells;
+		std::unordered_map<VecInt3, Cell*, ArrayHasher> allCells;
 		std::unordered_map<Cell*, std::vector<NeighbourCell>> cellsNeighbours;
 
 		//Bounding box of the cell coordinates
-		std::array<int, 3> bmin;
-		std::array<int, 3> bmax;
+		VecInt3 bmin;
+		VecInt3 bmax;
 
 		FlowFieldGridMap* gridmap = nullptr;
 		RayCast* clearanceTestRay = nullptr;
@@ -158,7 +159,7 @@ class FlowField : public Node {
 		Cell* _findClosestCell_underneath(Vector3 pos); //From pos, returns the first cell it finds underneath (so under pos.y)
 
 		bool cellWithinBounds(Vector3 cellPos);
-		bool cellWithinBounds(std::array<int, 3> cellPos);
+		bool cellWithinBounds(VecInt3 cellPos);
 		
 		/*
 		 * @brief Finds the occupied cells a given cell can directly access
@@ -200,7 +201,12 @@ class FlowField : public Node {
 		 */
 		void buildDebugDistanceField();
 
-		Cell* getCell(std::array<int, 3> cellCoords);
+		Cell* getCell(VecInt3 cellCoords);
+
+		/*
+		 * @brief Returns all the cells within a given radius of pos (a global position)
+		 */
+		std::vector<Cell*> getCellsNearToPos(Vector3 pos, float radius, bool onlyLedges = false);
 
 		/*
 		* @brief Projection functions

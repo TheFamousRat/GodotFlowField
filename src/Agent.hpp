@@ -30,11 +30,8 @@ namespace godot
             ~Agent();
 
             /*
-            * @brief Returns info on an agent's target velocity gradient at his current speed (used to steer while avoiding collisions)
+            * @brief Returns info on an agent's parts of its target velocity gradient at his current speed (used to steer while avoiding collisions)
             */
-            float getCostField();
-            Vector3 getGradient();
-
             Vector3 getClosestObstaclePointDir(Vector3 cellPos, Vector3 cellDir, Vector3 proposedVel);
             float getDirPossibility(Vector3 cellPos, Vector3 cellDir);
             float obstacleCostField(Vector3 cellPos, Vector3 cellDir, Vector3 proposedVel);

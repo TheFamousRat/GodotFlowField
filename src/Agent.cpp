@@ -12,14 +12,6 @@ Agent::~Agent() {
     
 }
 
-float Agent::getCostField() {
-
-}
-
-Vector3 Agent::getGradient() {
-
-}
-
 /*
  * Obstacle field functions
  */
