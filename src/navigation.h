@@ -96,7 +96,7 @@ public:
 	void _ready();
 	void _process(float passed);
 
-	void registerAgent(Spatial* agentOwner, Area* neighboursDetector);
+	void registerAgent(Spatial* agentOwner, Area* neighboursDetector, DetourNavigationMesh* navmesh);
 	void removeAgent(Spatial* agentOwner);
 
 	void doStep(float stepTime);

@@ -13,6 +13,7 @@
 #include <Plane.hpp>
 
 #include "Agent.hpp"
+#include "navigation_mesh.h"
 
 namespace godot {
 
@@ -29,7 +30,7 @@ namespace godot {
 
             static void _register_methods();
 
-            void createAgent(Spatial* agentOwner, Area* neighboursDetector);
+            void createAgent(Spatial* agentOwner, Area* neighboursDetector, DetourNavigationMesh* agentNavmesh);
             void deleteAgent(Spatial* agentOwner);
             Agent* getAgent(Spatial* agentOwner);
             std::vector<Agent*> getAgentNeighbours(Agent* agent);

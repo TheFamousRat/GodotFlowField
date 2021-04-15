@@ -10,8 +10,9 @@
 #include "flowfield.h"
 
 #define SIGMOID_ACCURACY 10.0 //Used in functions using an exponential for a threshold. The higher the value, the "cleaner" the cutoff at the threshold (where value go from close to 0 to near infinity)
-#define OBSTACLE_EXP_SCALE 10.0 //Same as previous constant, but for obstacles (whether static or dynamic)
+#define OBSTACLE_EXP_SCALE 3.0 //Same as previous constant, but for obstacles (whether static or dynamic)
 #define SPEED_DIST_FAC 2.0
+#define EPSILON 1e-5
 
 namespace godot
 {
@@ -20,11 +21,12 @@ namespace godot
             Vector3 prefVelocity; //The last targeted agent velocity
             Vector3 velocity; //The real last velocity of the agent
             
+            float maxAccel;
             float maxSpeed;
             float radius; //Distance the agent wants to impose between his center and any object
             float obstacleMinDistance; //Distance the agent wants to impose between his center and a static obstacle
 
-            FlowField* flowField;
+            FlowField* flowField = nullptr;
             
             Agent();
             ~Agent();

@@ -33,8 +33,8 @@ void DetourNavigation::_register_methods()
 
 /** Exposed functions **/
 
-void DetourNavigation::registerAgent(Spatial* agentOwner, Area* neighboursDetector) {
-	sim->createAgent(agentOwner, neighboursDetector);
+void DetourNavigation::registerAgent(Spatial* agentOwner, Area* neighboursDetector, DetourNavigationMesh* navmesh) {
+	sim->createAgent(agentOwner, neighboursDetector, navmesh);
 }
 
 void DetourNavigation::removeAgent(Spatial* agentOwner) {

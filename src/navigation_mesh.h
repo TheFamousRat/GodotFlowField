@@ -49,7 +49,6 @@ class DetourNavigationMesh : public Spatial
 private:
 	bool _is_being_deleted = false;
 	MeshLibrary* gridmapMeshlib = nullptr;
-	FlowField* flowField = nullptr;
 	std::vector<CubeMesh*> meshlibCubes;
 	float gridmapCellSize = GRIDMAP_CELL_SIZE;
 	bool gridMapVisible = true;
@@ -65,6 +64,8 @@ public:
 	SETGET(collision_ids_storage, Array);
 	SETGET(serialized_navmesh_data, PoolByteArray);
 	SETGET(uuid, String);
+
+	FlowField* flowField = nullptr;
 
 	bool debug_navmesh_dirty = true;
 

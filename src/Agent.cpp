@@ -3,8 +3,9 @@
 using namespace godot;
 
 Agent::Agent() {
+    maxAccel = 4000.0;
     maxSpeed = 5.0;
-    radius = 0.5;
+    radius = 1.0;
     obstacleMinDistance = 0.5;
 }
 
@@ -76,7 +77,7 @@ Vector3 Agent::getNeighbourClosestDir(Agent* neighbour, Vector3 proposedVel) {
     Vector3 relNeighbourPos = neighbour->position - position;
     Vector3 relNeighbourVel = neighbour->velocity - proposedVel;
     
-    float t = std::clamp(-relNeighbourPos.dot(relNeighbourVel) / relNeighbourVel.length_squared(), 0.0f, 1.0f);
+    float t = std::clamp(-relNeighbourPos.dot(relNeighbourVel) / (EPSILON + relNeighbourVel.length_squared()), 0.0, 1.0);
 
     return relNeighbourPos + t * relNeighbourVel;
 }

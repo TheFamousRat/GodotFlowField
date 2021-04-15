@@ -15,7 +15,7 @@ void Simulation::_register_methods() {
     
 }
 
-void Simulation::createAgent(Spatial* agentOwner, Area* neighboursDetector) {
+void Simulation::createAgent(Spatial* agentOwner, Area* neighboursDetector, DetourNavigationMesh* agentNavmesh) {
     if (allAgents.find(agentOwner) != allAgents.end()) {
         WARN_PRINT("Couldn't create agent : already the simulation\n");
         return;
@@ -27,6 +27,7 @@ void Simulation::createAgent(Spatial* agentOwner, Area* neighboursDetector) {
     Vector3 ownerGlobalPos = agentOwner->get_global_transform().origin;
     newAgent->position = ownerGlobalPos;
     newAgent->neighboursDetector = neighboursDetector;
+    newAgent->flowField = agentNavmesh->flowField;
 
     allAreas[neighboursDetector] = newAgent;
     allAgents[agentOwner] = newAgent;   
@@ -47,7 +48,6 @@ void Simulation::deleteAgent(Spatial* agentOwner) {
 }
 
 Agent* Simulation::getAgent(Spatial* agentOwner) {
-	std::cout << agentOwner->get_name().alloc_c_string() << '\n';
     auto agentIt = allAgents.find(agentOwner);
     if (agentIt != allAgents.end()) {
         return agentIt->second;
@@ -91,7 +91,7 @@ Vector3 Simulation::getAgentObstaclesGradient(Agent* agent) {
 
     for (auto it = obstacleCells.begin() ; it != obstacleCells.end() ; it++) {
         Cell* currentObstCell = (*it);
-        
+
         godot::Array cellDirs = currentObstCell->obstacleDirection;
         for (int i(0) ; i < cellDirs.size() ; i++) {
             Vector3 cellCoords = agent->flowField->mapToWorld(Vector3(currentObstCell->cellPos[0], currentObstCell->cellPos[1], currentObstCell->cellPos[2]));
@@ -108,10 +108,13 @@ Vector3 Simulation::getAgentSpeedPrefGradient(Agent* agent) {
 }
 
 Vector3 Simulation::getAgentGradient(Agent* agent) {
+    if (agent->flowField == nullptr)
+        ERR_PRINT("No flow field defined for agent : can't compute gradient");
+
     Vector3 agentGradient = Vector3(0.0, 0.0, 0.0);
 
-    agentGradient += getAgentNeighboursGradient(agent);
-    agentGradient += getAgentObstaclesGradient(agent);
+    agentGradient += 200.0 * getAgentNeighboursGradient(agent);
+    //agentGradient += getAgentObstaclesGradient(agent);
     agentGradient += getAgentSpeedPrefGradient(agent);
 
     return agentGradient;
@@ -121,6 +124,17 @@ void Simulation::doStep(float stepTime) {
     for (auto it = allAgents.begin() ; it != allAgents.end() ; it++) {
         Agent* agent = it->second;
         
+        Vector3 gradient = getAgentGradient(agent);
+
+        std::cout << gradient.x << ' ' << gradient.y << ' ' << gradient.z << '\n';
+
+        Vector3 acceleration = -stepTime * 5.0 * gradient.normalized() * std::min(gradient.length(), agent->maxAccel);
+        
+        Vector3 velocity = agent->velocity + acceleration * stepTime;
+        velocity = velocity.normalized() * std::min(velocity.length(), agent->maxSpeed);
+        agent->velocity = velocity;
+
+        agent->position = agent->position + agent->velocity * stepTime;
     } 
 }
 
