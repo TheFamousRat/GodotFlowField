@@ -202,6 +202,12 @@ class FlowField : public Node {
 
 		Cell* getCell(std::array<int, 3> cellCoords);
 
+		/*
+		* @brief Projection functions
+		*/
+		Vector3 mapToWorld(Vector3 worldCoords);
+		Vector3 worldToMap(Vector3 mapCoords);
+
 	private:
 		/*
 		* @brief The usual implementation of integration field building using Dijkstra's algorithm. Only takes one target for now

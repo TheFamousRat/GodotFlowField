@@ -506,3 +506,11 @@ void FlowField::buildDebugDistanceField() {
 Cell* FlowField::getCell(std::array<int, 3> cellCoords) {
 	return allCells[cellCoords];
 }
+
+Vector3 FlowField::mapToWorld(Vector3 worldCoords) {
+	return gridmap->map_to_world(worldCoords.x, worldCoords.y, worldCoords.z);
+}
+
+Vector3 FlowField::worldToMap(Vector3 mapCoords) {
+	return gridmap->world_to_map(mapCoords);
+}
