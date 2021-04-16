@@ -36,13 +36,13 @@ namespace godot {
             std::vector<Agent*> getAgentNeighbours(Agent* agent);
 
             //Velocity gradient as influenced by nearby agents
-            Vector3 getAgentNeighboursGradient(Agent* agent);
+            Vector3 getAgentNeighboursGradient(Agent* agent, float stepTime);
             //Velocity gradient as influenced by nearby static obstacles
             Vector3 getAgentObstaclesGradient(Agent* agent);
             //Velocity gradient as influenced by agent targets
             Vector3 getAgentSpeedPrefGradient(Agent* agent);
             //Sum of the three above
-            Vector3 getAgentGradient(Agent* agent);
+            Vector3 getAgentGradient(Agent* agent, float stepTime);
 
             void doStep(float stepTime);
 

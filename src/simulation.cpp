@@ -72,13 +72,13 @@ std::vector<Agent*> Simulation::getAgentNeighbours(Agent* agent) {
     return ret;
 }
 
-Vector3 Simulation::getAgentNeighboursGradient(Agent* agent) {
+Vector3 Simulation::getAgentNeighboursGradient(Agent* agent, float stepTime) {
     Vector3 ret = Vector3(0.0, 0.0, 0.0);
 
     std::vector<Agent*> neighbours = getAgentNeighbours(agent);
 
-    for (auto it = neighbours.begin() ; it != neighbours.end() ; it++) {
-        ret += agent->neighbourGradient(*it, agent->velocity);
+    for (int i(0) ; i < std::min(static_cast<int>(neighbours.size()), 1000) ; i++) {
+        ret += agent->neighbourGradient(neighbours[i], agent->velocity, stepTime);
     }
 
     return ret;
@@ -107,17 +107,17 @@ Vector3 Simulation::getAgentSpeedPrefGradient(Agent* agent) {
     return agent->speedPrefGradient(agent->velocity, planeNormal);
 }
 
-Vector3 Simulation::getAgentGradient(Agent* agent) {
+Vector3 Simulation::getAgentGradient(Agent* agent, float stepTime) {
     if (agent->flowField == nullptr)
         ERR_PRINT("No flow field defined for agent : can't compute gradient");
 
     Vector3 agentGradient = Vector3(0.0, 0.0, 0.0);
 
-    //agentGradient += 100.0 * getAgentNeighboursGradient(agent);
+    agentGradient += getAgentNeighboursGradient(agent, stepTime);
     //std::cout << agentGradient.length() << '|';
-    //agentGradient += 10.0 * getAgentObstaclesGradient(agent);
+    agentGradient += getAgentObstaclesGradient(agent);
     //std::cout << agentGradient.length() << '|';
-    agentGradient += 10.0 * getAgentSpeedPrefGradient(agent);
+    agentGradient += getAgentSpeedPrefGradient(agent);
     //std::cout << agentGradient.length() << '\n';
 
     return agentGradient;
@@ -127,16 +127,24 @@ void Simulation::doStep(float stepTime) {
     for (auto it = allAgents.begin() ; it != allAgents.end() ; it++) {
         Agent* agent = it->second;
         
-        Vector3 gradient = getAgentGradient(agent);
+        Vector3 gradient = getAgentGradient(agent, stepTime);
+        Vector3 acceleration; 
 
-        Vector3 acceleration = -stepTime * gradient.normalized() * std::min(gradient.length(), agent->maxAccel);
-        
-        Vector3 velocity = agent->velocity + acceleration * stepTime;
+        acceleration = -gradient;
+        acceleration = acceleration.normalized() * std::min(acceleration.length(), agent->maxAccel);
+
+        Vector3 velocity = agent->velocity;
+        Vector3 friction = -agent->velocity * 0.1;
+        velocity += stepTime * (acceleration + friction);
+
         //Sticking the velocity to the velocity plane
-        Vector3 planeNormal = (-agent->prefVelocity.cross(agent->prefVelocity.cross(Vector3(0.0,1.0,0.0)))).normalized();
-        velocity = Plane(Vector3(0.0, 0.0, 0.0), planeNormal).project(velocity);
-        //Constraining the velocity to the right speed
-        velocity = velocity.normalized() * std::min(velocity.length(), agent->maxSpeed);
+        if (velocity.length_squared() > 0.01) {
+            Vector3 planeNormal = (-agent->prefVelocity.cross(agent->prefVelocity.cross(Vector3(0.0,1.0,0.0)))).normalized();
+            velocity = Plane(Vector3(0.0, 0.0, 0.0), planeNormal).project(velocity);
+            //Constraining the velocity to the right speed
+            velocity = velocity.normalized() * std::min(velocity.length(), agent->maxSpeed);
+        }
+        
         agent->velocity = velocity;
 
         agent->position = agent->position + agent->velocity * stepTime;

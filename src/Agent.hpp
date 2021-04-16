@@ -11,7 +11,7 @@
 
 #define SIGMOID_ACCURACY 2.0 //Used in functions using an exponential for a threshold. The higher the value, the "cleaner" the cutoff at the threshold (where value go from close to 0 to near infinity)
 #define OBSTACLE_EXP_SCALE 2.0 //Same as previous constant, but for obstacles (whether static or dynamic)
-#define SPEED_DIST_FAC 2.0
+#define SPEED_DIST_FAC 1.0
 #define EPSILON 1e-3
 
 namespace godot
@@ -39,9 +39,9 @@ namespace godot
             float obstacleCostField(Vector3 cellPos, Vector3 cellDir, Vector3 proposedVel);
             Vector3 obstacleGradient(Vector3 cellPos, Vector3 cellDir, Vector3 proposedVel);
 
-            Vector3 getNeighbourClosestDir(Agent* neighbour, Vector3 proposedVel);
-            float neighbourCostField(Agent* neighbour, Vector3 proposedVel);
-            Vector3 neighbourGradient(Agent* neighbour, Vector3 proposedVel);
+            Vector3 getNeighbourClosestDir(Agent* neighbour, Vector3 proposedVel, float stepTime);
+            float neighbourCostField(Agent* neighbour, Vector3 proposedVel, float stepTime);
+            Vector3 neighbourGradient(Agent* neighbour, Vector3 proposedVel, float stepTime);
 
             float speedPrefCostField(Vector3 proposedVel, Vector3 planeNormal);
             Vector3 speedPrefGradient(Vector3 proposedVel, Vector3 planeNormal);

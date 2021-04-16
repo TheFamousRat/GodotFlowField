@@ -3,10 +3,10 @@
 using namespace godot;
 
 Agent::Agent() {
-    maxAccel = 4000.0;
-    maxSpeed = 5.0;
+    maxAccel = 200.0;
+    maxSpeed = 15.0;
     radius = 1.0;
-    obstacleMinDistance = 1.0;
+    obstacleMinDistance = 0.2;
 }
 
 Agent::~Agent() {
@@ -69,7 +69,7 @@ Vector3 Agent::obstacleGradient(Vector3 cellPos, Vector3 cellDir, Vector3 propos
     float u = proposedVel.length_squared();
     Vector3 up = 2.0 * proposedVel;
     float v = exp(OBSTACLE_EXP_SCALE * (radius + obstacleMinDistance - closestPointDir.length()));
-    Vector3 vp = OBSTACLE_EXP_SCALE * closestPointDir * v;
+    Vector3 vp = OBSTACLE_EXP_SCALE * closestPointDir.normalized() * v;
     
     return (dirPossibility*(up * v + u * vp));
 }
@@ -78,30 +78,30 @@ Vector3 Agent::obstacleGradient(Vector3 cellPos, Vector3 cellDir, Vector3 propos
  * Neighbour agents field functions
  */
 
-Vector3 Agent::getNeighbourClosestDir(Agent* neighbour, Vector3 proposedVel) {
+Vector3 Agent::getNeighbourClosestDir(Agent* neighbour, Vector3 proposedVel, float stepTime) {
     Vector3 relNeighbourPos = neighbour->position - position;
     Vector3 relNeighbourVel = neighbour->velocity - proposedVel;
     
     float relVecLenSq = relNeighbourVel.length_squared();
-    float t = 1.0f;
+    float t = stepTime;
 
     if (!isRoughlyZero(relVecLenSq)) {
-        float t = std::clamp(-relNeighbourPos.dot(relNeighbourVel) / relVecLenSq, 0.0f, 1.0f);
+        float t = std::clamp(-relNeighbourPos.dot(relNeighbourVel) / relVecLenSq, 0.0f, stepTime);
     }
 
     return relNeighbourPos + t * relNeighbourVel;
 }
 
-float Agent::neighbourCostField(Agent* neighbour, Vector3 proposedVel) {
-    Vector3 closestVec = getNeighbourClosestDir(neighbour, proposedVel);
+float Agent::neighbourCostField(Agent* neighbour, Vector3 proposedVel, float stepTime) {
+    Vector3 closestVec = getNeighbourClosestDir(neighbour, proposedVel, stepTime);
     
-    return exp(-OBSTACLE_EXP_SCALE * (closestVec.length() - radius - neighbour->radius));
+    return std::exp(OBSTACLE_EXP_SCALE * (radius + neighbour->radius - closestVec.length()));
 }
 
-Vector3 Agent::neighbourGradient(Agent* neighbour, Vector3 proposedVel) {
-    Vector3 closestVec = getNeighbourClosestDir(neighbour, proposedVel);
+Vector3 Agent::neighbourGradient(Agent* neighbour, Vector3 proposedVel, float stepTime) {
+    Vector3 closestVec = getNeighbourClosestDir(neighbour, proposedVel, stepTime);
     
-    return OBSTACLE_EXP_SCALE * closestVec.normalized() * exp(-OBSTACLE_EXP_SCALE * (closestVec.length() - radius - neighbour->radius));
+    return 20.0 * OBSTACLE_EXP_SCALE * closestVec.normalized() * std::exp(OBSTACLE_EXP_SCALE * (radius + neighbour->radius - closestVec.length()));
 }
 
 /*
@@ -128,7 +128,7 @@ float Agent::speedPrefCostField(Vector3 proposedVel, Vector3 planeNormal) {
 Vector3 Agent::speedPrefGradient(Vector3 proposedVel, Vector3 planeNormal) {    
     Vector3 speedGradient = SPEED_DIST_FAC * 2.0 * (proposedVel - prefVelocity);
     
-    Vector3 limitGradient = SIGMOID_ACCURACY * proposedVel.normalized() * exp(SIGMOID_ACCURACY * (proposedVel.length() - prefVelocity.length()));
+    //Vector3 limitGradient = SIGMOID_ACCURACY * proposedVel.normalized() * exp(SIGMOID_ACCURACY * (proposedVel.length() - prefVelocity.length()));
     
     /*Vector3 dirGradient(0.0, 0.0, 0.0);
     float targetSpeedSq = prefVelocity.length_squared();
@@ -138,5 +138,5 @@ Vector3 Agent::speedPrefGradient(Vector3 proposedVel, Vector3 planeNormal) {
     
     Vector3 planeGradient = (proposedVel.normalized() - planeNormal) * exp( (proposedVel.length() - proposedVel.dot(planeNormal)) );*/
 
-    return speedGradient + limitGradient;// + dirGradient; + planeGradient;
+    return speedGradient;// + limitGradient;// + dirGradient; + planeGradient;
 }
