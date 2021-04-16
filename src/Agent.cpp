@@ -6,7 +6,7 @@ Agent::Agent() {
     maxAccel = 4000.0;
     maxSpeed = 5.0;
     radius = 1.0;
-    obstacleMinDistance = 0.5;
+    obstacleMinDistance = 1.0;
 }
 
 Agent::~Agent() {
@@ -32,11 +32,16 @@ Vector3 Agent::getClosestObstaclePointDir(Vector3 cellPos, Vector3 cellDir, Vect
     float dot_Cv = C.dot(v);
     
     float vFun = v.length_squared() - pow(dot_dv, 2.0);
-    float uFun_t = (dot_Cv - dot_Cd * dot_dv);
-    float uFun_l = (dot_Cv * dot_dv - dot_Cd * v.length_squared());
-    
-    float l = std::clamp(uFun_l / vFun, 0.0f, 1.0f);
-    float t = std::clamp(uFun_t / vFun, 0.0f, 1.0f);
+    float l = 1.0f;
+    float t = 1.0f;
+
+    if (!isRoughlyZero(vFun)) {
+        float uFun_t = (dot_Cv - dot_Cd * dot_dv);
+        float uFun_l = (dot_Cv * dot_dv - dot_Cd * v.length_squared());
+        
+        float l = std::clamp(uFun_l / vFun, 0.0f, 1.0f);
+        float t = std::clamp(uFun_t / vFun, 0.0f, 1.0f);
+    }
     
     return flowField->mapToWorld(C + d * l - t * v);
 }
@@ -77,7 +82,12 @@ Vector3 Agent::getNeighbourClosestDir(Agent* neighbour, Vector3 proposedVel) {
     Vector3 relNeighbourPos = neighbour->position - position;
     Vector3 relNeighbourVel = neighbour->velocity - proposedVel;
     
-    float t = std::clamp(-relNeighbourPos.dot(relNeighbourVel) / (EPSILON + relNeighbourVel.length_squared()), 0.0, 1.0);
+    float relVecLenSq = relNeighbourVel.length_squared();
+    float t = 1.0f;
+
+    if (!isRoughlyZero(relVecLenSq)) {
+        float t = std::clamp(-relNeighbourPos.dot(relNeighbourVel) / relVecLenSq, 0.0f, 1.0f);
+    }
 
     return relNeighbourPos + t * relNeighbourVel;
 }
@@ -103,29 +113,30 @@ float Agent::speedPrefCostField(Vector3 proposedVel, Vector3 planeNormal) {
     float speedPref = SPEED_DIST_FAC * (proposedVel - prefVelocity).length_squared();
     
     //Allowing the agent to take speed below what was requested, but not above
-    float velRatio = proposedVel.length_squared() / prefVelocity.length_squared();
-    float limitPref = exp(SIGMOID_ACCURACY * (velRatio - 1.0));
+    //float velRatio = proposedVel.length_squared() / prefVelocity.length_squared();
+    float limitPref = exp(SIGMOID_ACCURACY * (proposedVel.length() - prefVelocity.length()));
     
     //Forcing the agent to stay close to the direction the user gave him
-    float dirPref = (proposedVel - prefVelocity * proposedVel.dot(prefVelocity)/prefVelocity.length_squared()).length();
+    //float dirPref = (proposedVel - prefVelocity * proposedVel.dot(prefVelocity)/prefVelocity.length_squared()).length();
     
     //Forcing the proposedVel to be close to a given proposedVel plane (so the agent doesn't start flying)
-    float planePref = exp(pow(proposedVel.dot(planeNormal), 2.0)) - 1.0;
+    //float planePref = exp( (proposedVel.length() - proposedVel.dot(planeNormal)) );
     
-    return speedPref + limitPref + dirPref + planePref;
+    return speedPref + limitPref;// + planePref + dirPref;
 }
 
-Vector3 Agent::speedPrefGradient(Vector3 proposedVel, Vector3 planeNormal) {
-    float targetSpeedSq = prefVelocity.length_squared();
-    
+Vector3 Agent::speedPrefGradient(Vector3 proposedVel, Vector3 planeNormal) {    
     Vector3 speedGradient = SPEED_DIST_FAC * 2.0 * (proposedVel - prefVelocity);
     
-    float velRatio = proposedVel.length_squared()/prefVelocity.length_squared();
-    Vector3 limitGradient = SIGMOID_ACCURACY * 2.0 * (proposedVel/targetSpeedSq) * exp(SIGMOID_ACCURACY * (velRatio - 1.0));
+    Vector3 limitGradient = SIGMOID_ACCURACY * proposedVel.normalized() * exp(SIGMOID_ACCURACY * (proposedVel.length() - prefVelocity.length()));
     
-    Vector3 dirGradient = 2.0 * (proposedVel - prefVelocity * (prefVelocity.dot(proposedVel)/targetSpeedSq));
+    /*Vector3 dirGradient(0.0, 0.0, 0.0);
+    float targetSpeedSq = prefVelocity.length_squared();
+    if (!isRoughlyZero(targetSpeedSq)) {
+        Vector3 dirGradient = 2.0 * (proposedVel - prefVelocity * (prefVelocity.dot(proposedVel)/targetSpeedSq));
+    }
     
-    Vector3 planeGradient = 2.0 * proposedVel.dot(planeNormal) * planeNormal * (exp(pow(proposedVel.dot(planeNormal), 2.0)) - 1.0);
-    
-    return speedGradient + limitGradient + dirGradient + planeGradient;
+    Vector3 planeGradient = (proposedVel.normalized() - planeNormal) * exp( (proposedVel.length() - proposedVel.dot(planeNormal)) );*/
+
+    return speedGradient + limitGradient;// + dirGradient; + planeGradient;
 }

@@ -103,7 +103,7 @@ Vector3 Simulation::getAgentObstaclesGradient(Agent* agent) {
 }
 
 Vector3 Simulation::getAgentSpeedPrefGradient(Agent* agent) {
-    Vector3 planeNormal = agent->prefVelocity.cross(agent->prefVelocity.cross(Vector3(0.0,1.0,0.0)));
+    Vector3 planeNormal = (-agent->prefVelocity.cross(agent->prefVelocity.cross(Vector3(0.0,1.0,0.0)))).normalized();
     return agent->speedPrefGradient(agent->velocity, planeNormal);
 }
 
@@ -113,9 +113,12 @@ Vector3 Simulation::getAgentGradient(Agent* agent) {
 
     Vector3 agentGradient = Vector3(0.0, 0.0, 0.0);
 
-    agentGradient += 200.0 * getAgentNeighboursGradient(agent);
-    //agentGradient += getAgentObstaclesGradient(agent);
-    agentGradient += getAgentSpeedPrefGradient(agent);
+    //agentGradient += 100.0 * getAgentNeighboursGradient(agent);
+    //std::cout << agentGradient.length() << '|';
+    //agentGradient += 10.0 * getAgentObstaclesGradient(agent);
+    //std::cout << agentGradient.length() << '|';
+    agentGradient += 10.0 * getAgentSpeedPrefGradient(agent);
+    //std::cout << agentGradient.length() << '\n';
 
     return agentGradient;
 }
@@ -126,11 +129,13 @@ void Simulation::doStep(float stepTime) {
         
         Vector3 gradient = getAgentGradient(agent);
 
-        std::cout << gradient.x << ' ' << gradient.y << ' ' << gradient.z << '\n';
-
-        Vector3 acceleration = -stepTime * 5.0 * gradient.normalized() * std::min(gradient.length(), agent->maxAccel);
+        Vector3 acceleration = -stepTime * gradient.normalized() * std::min(gradient.length(), agent->maxAccel);
         
         Vector3 velocity = agent->velocity + acceleration * stepTime;
+        //Sticking the velocity to the velocity plane
+        Vector3 planeNormal = (-agent->prefVelocity.cross(agent->prefVelocity.cross(Vector3(0.0,1.0,0.0)))).normalized();
+        velocity = Plane(Vector3(0.0, 0.0, 0.0), planeNormal).project(velocity);
+        //Constraining the velocity to the right speed
         velocity = velocity.normalized() * std::min(velocity.length(), agent->maxSpeed);
         agent->velocity = velocity;
 

@@ -9,10 +9,10 @@
 
 #include "flowfield.h"
 
-#define SIGMOID_ACCURACY 10.0 //Used in functions using an exponential for a threshold. The higher the value, the "cleaner" the cutoff at the threshold (where value go from close to 0 to near infinity)
-#define OBSTACLE_EXP_SCALE 3.0 //Same as previous constant, but for obstacles (whether static or dynamic)
+#define SIGMOID_ACCURACY 2.0 //Used in functions using an exponential for a threshold. The higher the value, the "cleaner" the cutoff at the threshold (where value go from close to 0 to near infinity)
+#define OBSTACLE_EXP_SCALE 2.0 //Same as previous constant, but for obstacles (whether static or dynamic)
 #define SPEED_DIST_FAC 2.0
-#define EPSILON 1e-5
+#define EPSILON 1e-3
 
 namespace godot
 {
@@ -50,5 +50,9 @@ namespace godot
     };
 } // namespace godot
 
+template<typename T>
+bool isRoughlyZero(T val) {
+    return std::abs(val) <= EPSILON;
+};
 
 #endif

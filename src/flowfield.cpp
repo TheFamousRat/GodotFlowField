@@ -401,8 +401,6 @@ void FlowField::bakeCellNeighbours(Cell* cell) {
 		}
 	}
 
-	cell->baseCost += cell->obstacleDirection.size() * LEDGE_COST;
-
 	cellsNeighbours[cell] = std::vector<NeighbourCell>(neighbours);
 }
 
@@ -511,6 +509,7 @@ Cell* FlowField::getCell(VecInt3 cellCoords) {
 std::vector<Cell*> FlowField::getCellsNearToPos(Vector3 pos, float radius, bool onlyLedges) {
 	std::vector<Cell*> ret;
 	Vector3 cellSize = gridmap->get_cell_size();
+	Vector3 mapPos = gridmap->world_to_map(pos);
 
 	float radiusSq = pow(radius, 2.0);
 	float xBound = radius / cellSize.x;
@@ -524,9 +523,9 @@ std::vector<Cell*> FlowField::getCellsNearToPos(Vector3 pos, float radius, bool 
 
 			for (int z( std::ceil(-zBound) ) ; z <= std::floor(zBound) ; z++) {
 				VecInt3 cellCoords({
-					static_cast<int>(pos.x + static_cast<float>(x) * cellSize.x), 
-					static_cast<int>(pos.y + static_cast<float>(y) * cellSize.y), 
-					static_cast<int>(pos.z + static_cast<float>(z) * cellSize.z)
+					static_cast<int>(mapPos.x + static_cast<float>(x)), 
+					static_cast<int>(mapPos.y + static_cast<float>(y)), 
+					static_cast<int>(mapPos.z + static_cast<float>(z))
 				});
 
 				Cell* foundCell = getCell(cellCoords);
@@ -537,6 +536,8 @@ std::vector<Cell*> FlowField::getCellsNearToPos(Vector3 pos, float radius, bool 
 						ret.push_back(foundCell);
 					}
 				}
+
+				
 			}
 		}
 	}
